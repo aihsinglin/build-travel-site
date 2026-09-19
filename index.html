@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#5BB5EA">
+<meta name="description" content="用 Claude 打造專屬旅行網站的完整步驟與 Prompt 範本">
+<title>🧳 用 Claude 做一個專屬旅行網站｜步驟 × Prompt 範本</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800&family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --sky:#5BB5EA; --sky-mid:#7FC8F0; --sky-pale:#EAF6FD; --sky-dark:#2E8BC0;
+    --peach:#FFB9A3; --peach-pale:#FFF1EC; --lav:#B9A7E8; --lav-pale:#F3EFFC;
+    --ink:#2F3A45; --ink-soft:#6A7684; --line:#E3EBF2; --bg:#F7FBFE; --white:#fff;
+    --r:14px;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;-webkit-text-size-adjust:100%;}
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:'Noto Sans TC',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+    font-size:15px; line-height:1.85; letter-spacing:.01em;
+  }
+  .wrap{max-width:780px; margin:0 auto; padding:0 18px 70px;}
+
+  /* ── Hero ── */
+  .hero{
+    background:linear-gradient(140deg,var(--sky) 0%, var(--sky-mid) 45%, var(--lav) 100%);
+    color:#fff; padding:44px 18px 38px; text-align:center;
+    border-radius:0 0 26px 26px; margin-bottom:26px;
+  }
+  .hero h1{
+    font-family:'Nunito','Noto Sans TC',sans-serif; font-weight:800;
+    font-size:26px; margin:0 0 10px; line-height:1.35; letter-spacing:.02em;
+  }
+  .hero p{margin:0 auto; max-width:520px; font-size:14px; opacity:.95; line-height:1.8;}
+  .hero .badge{
+    display:inline-block; background:rgba(255,255,255,.22); backdrop-filter:blur(4px);
+    border:1px solid rgba(255,255,255,.35); border-radius:99px;
+    padding:4px 14px; font-size:12px; font-weight:700; margin-bottom:14px;
+    font-family:'Nunito',sans-serif; letter-spacing:.04em;
+  }
+
+  /* ── 區塊 ── */
+  .card{
+    background:var(--white); border:1px solid var(--line);
+    border-radius:var(--r); padding:18px 18px 16px; margin-bottom:16px;
+    box-shadow:0 1px 3px rgba(47,58,69,.04);
+  }
+  .card.tint{background:var(--sky-pale); border-color:rgba(91,181,234,.3);}
+  .card.warm{background:var(--peach-pale); border-color:rgba(255,185,163,.45);}
+  h2{
+    font-family:'Nunito','Noto Sans TC',sans-serif; font-weight:800;
+    font-size:19px; color:var(--sky-dark); margin:34px 0 14px;
+    padding-bottom:9px; border-bottom:2px solid var(--sky-pale);
+  }
+  h3{font-size:15.5px; font-weight:700; margin:0 0 8px; color:var(--ink);}
+  p{margin:0 0 10px;}
+  p:last-child{margin-bottom:0;}
+  strong{color:var(--sky-dark); font-weight:700;}
+  em{font-style:normal; background:linear-gradient(transparent 62%, var(--peach-pale) 62%); font-weight:500;}
+
+  /* ── 步驟 ── */
+  .step{
+    background:var(--white); border:1px solid var(--line); border-radius:var(--r);
+    padding:0; margin-bottom:16px; overflow:hidden;
+    box-shadow:0 1px 3px rgba(47,58,69,.04);
+  }
+  .step-head{
+    display:flex; align-items:flex-start; gap:12px;
+    padding:16px 18px 13px; background:linear-gradient(135deg,var(--sky-pale),#fff);
+    border-bottom:1px solid var(--line);
+  }
+  .step-n{
+    flex-shrink:0; width:30px; height:30px; border-radius:9px;
+    background:var(--sky); color:#fff; display:flex; align-items:center;
+    justify-content:center; font-family:'Nunito',sans-serif;
+    font-weight:800; font-size:14px; box-shadow:0 2px 5px rgba(91,181,234,.35);
+  }
+  .step-t{flex:1; min-width:0;}
+  .step-t h3{margin:2px 0 3px; font-size:16px;}
+  .step-t .why{font-size:12.5px; color:var(--ink-soft); line-height:1.7;}
+  .step-body{padding:14px 18px 16px;}
+
+  /* ── Prompt 區 ── */
+  .prompt{
+    position:relative; background:#2F3A45; border-radius:11px;
+    padding:14px 15px; margin:11px 0 4px;
+  }
+  .prompt pre{
+    margin:0; white-space:pre-wrap; word-break:break-word;
+    font-family:'Nunito','Noto Sans TC',ui-monospace,monospace;
+    font-size:13.2px; line-height:1.85; color:#EAF2F8;
+    padding-right:56px; -webkit-user-select:text; user-select:text;
+  }
+  .prompt pre b{color:#9BD8F5; font-weight:700;}
+  .copy{
+    position:absolute; top:10px; right:10px;
+    background:rgba(255,255,255,.12); color:#EAF2F8;
+    border:1px solid rgba(255,255,255,.22); border-radius:8px;
+    font-family:'Nunito',sans-serif; font-size:11.5px; font-weight:700;
+    padding:4px 10px; cursor:pointer; transition:all .16s; white-space:nowrap;
+  }
+  .copy:hover{background:rgba(255,255,255,.22);}
+  .copy.done{background:#4FC48A; border-color:#4FC48A; color:#fff;}
+  .copy.fail{background:#F26A6A; border-color:#F26A6A; color:#fff;}
+  .fillhint{font-size:11.5px; color:var(--ink-soft); margin-top:7px; line-height:1.65;}
+
+  /* ── 清單 ── */
+  ul.neat{margin:8px 0 0; padding-left:0; list-style:none;}
+  ul.neat li{
+    position:relative; padding-left:19px; margin-bottom:7px;
+    font-size:14px; line-height:1.8;
+  }
+  ul.neat li::before{
+    content:''; position:absolute; left:3px; top:11px;
+    width:6px; height:6px; border-radius:50%; background:var(--sky-mid);
+  }
+  ul.neat.check li::before{
+    content:'✓'; background:none; left:0; top:0; width:auto; height:auto;
+    color:var(--sky-dark); font-weight:800; font-size:13px;
+  }
+
+  /* ── 技巧卡 ── */
+  .tip{
+    display:flex; gap:12px; padding:13px 0;
+    border-bottom:1px dashed var(--line);
+  }
+  .tip:last-child{border-bottom:none; padding-bottom:0;}
+  .tip .ic{
+    flex-shrink:0; width:26px; height:26px; border-radius:8px;
+    background:var(--lav-pale); display:flex; align-items:center;
+    justify-content:center; font-size:14px;
+  }
+  .tip .tx{flex:1; min-width:0; font-size:14px; line-height:1.78;}
+  .tip .tx b{display:block; color:var(--sky-dark); font-size:14.5px; margin-bottom:2px;}
+
+  /* ── 功能點子 ── */
+  .ideas{display:grid; grid-template-columns:repeat(auto-fit,minmax(215px,1fr)); gap:9px; margin-top:10px;}
+  .idea{
+    background:var(--white); border:1px solid var(--line); border-radius:11px;
+    padding:11px 13px; font-size:13.5px; line-height:1.7;
+  }
+  .idea b{display:block; color:var(--sky-dark); font-size:14px; font-weight:700; margin-bottom:1px;}
+  .idea span{color:var(--ink-soft); font-size:12px;}
+
+  footer{
+    text-align:center; margin-top:38px; padding-top:22px;
+    border-top:1px solid var(--line); font-size:12.5px;
+    color:var(--ink-soft); line-height:1.9;
+  }
+
+  @media (max-width:560px){
+    .hero{padding:36px 16px 32px;}
+    .hero h1{font-size:22px;}
+    .wrap{padding:0 14px 56px;}
+    .card,.step-body{padding-left:15px; padding-right:15px;}
+    .step-head{padding:14px 15px 12px;}
+    .prompt pre{font-size:12.8px; padding-right:52px;}
+  }
+  @media print{
+    .copy{display:none;}
+    .hero{background:#fff !important; color:var(--ink) !important; border-radius:0;}
+    .prompt{background:#F2F6F9;}
+    .prompt pre{color:#2F3A45;}
+    .prompt pre b{color:#2E8BC0;}
+    .step,.card{break-inside:avoid;}
+    @page{margin:14mm;}
+  }
+  @media (prefers-reduced-motion:reduce){*{transition:none !important; scroll-behavior:auto !important;}}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="badge">TRAVEL SITE PLAYBOOK</div>
+  <h1>🧳 用 Claude 做一個<br>專屬你的旅行網站</h1>
+  <p>從零開始，做出一個能離線看、手機好讀、行程地圖預算全包的單頁網站。<br>照著步驟問，每段 prompt 都能直接複製。</p>
+</div>
+
+<div class="wrap">
+
+  <div class="card tint">
+    <h3>📖 這份怎麼用</h3>
+    <p>下面有 <strong>8 個步驟</strong>，照順序做。每步都附一段可以直接複製的 prompt，裡面
+      <b style="color:#2E8BC0">[方括號]</b> 的地方換成你自己的資訊就好。</p>
+    <p style="margin-top:8px;">最重要的觀念：<em>不要想一次做完</em>。一次丟一個需求，做完看一眼再繼續 ——
+      這樣出來的品質，比一次寫落落長的需求好非常多。</p>
+    <p style="margin-top:8px; font-size:13px; color:var(--ink-soft);">
+      💡 在 Claude 的 <strong>Cowork 模式</strong>做最順，它可以直接把檔案存進你指定的資料夾，隨時打開來看。</p>
+  </div>
+
+  <h2>📋 八個步驟</h2>
+
+  <!-- STEP 1 -->
+  <div class="step">
+    <div class="step-head">
+      <div class="step-n">1</div>
+      <div class="step-t">
+        <h3>先把行程談定，別急著要網站</h3>
+        <div class="why">直接說「幫我做旅行網站」，Claude 會同時猜你的行程跟版面，兩邊都做不好。先專心把「要去哪、怎麼排」談清楚。</div>
+      </div>
+    </div>
+    <div class="step-body">
+      <div class="prompt">
+        <button class="copy" type="button">複製</button>
+        <pre>我要規劃一趟 <b>[天數]</b> 天的 <b>[目的地]</b> 旅行，先不要做網站，我們先把行程排好。
+
+・出發／回程：<b>[日期]</b>
+・人數與關係：<b>[幾個人、朋友或情侶或家人]</b>
+・交通方式：<b>[自駕／大眾運輸／還沒決定]</b>
+・旅行風格：<b>[慢活悠閒／緊湊踩點／深度文化／美食優先]</b>
+・預算感覺：<b>[每人大概多少]</b>
+・一定要去的：<b>[列出來，沒有就寫沒有]</b>
+・想避開的：<b>[太多人的地方／太早起／爬山……]</b>
+
+請幫我排出每天的行程骨架，包含移動順序、大概時間、
+以及每段之間怎麼移動、要多久。
+如果你覺得我的安排哪裡不合理，直接告訴我。</pre>
+      </div>
+      <div class="fillhint">✏️ 這步會來回幾次很正常。行程滿意了再進下一步。</div>
+    </div>
+  </div>
+
+  <!-- STEP 2 -->
+  <div class="step">
+    <div class="step-head">
+      <div class="step-n">2</div>
+      <div class="step-t">
+        <h3>變成一個單頁網站</h3>
+        <div class="why">關鍵是要求「全部寫在一個檔案裡」。這樣你傳給旅伴、存到手機、沒網路都能打開。</div>
+      </div>
+    </div>
+    <div class="step-body">
+      <div class="prompt">
+        <button class="copy" type="button">複製</button>
+        <pre>行程確定了，請做成一個旅行網站，要求：
+
+・<b>全部寫在單一個 .html 檔</b>裡（CSS、JS 都內嵌），沒網路也能開
+・手機優先設計，單手滑得順、字要好讀
+・用分頁切換：行程／景點／美食／交通住宿／預算／實用資訊
+・每天用時間軸呈現，每個地點旁邊附 Google Maps 連結
+・視覺風格：<b>[溫暖柔和／簡潔專業／活潑繽紛／日系清爽]</b>，
+  主色用 <b>[顏色]</b>
+・標題和日期用好看一點的字體，內文以易讀為主
+
+先把整體架構和「行程」這一頁做好，其他分頁之後再補。</pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 3 -->
+  <div class="step">
+    <div class="step-head">
+      <div class="step-n">3</div>
+      <div class="step-t">
+        <h3>一次加一個功能</h3>
+        <div class="why">同一句話塞五個功能，通常會有二到三個做得很敷衍。分開講，每個都會做得完整。</div>
+      </div>
+    </div>
+    <div class="step-body">
+      <div class="prompt">
+        <button class="copy" type="button">複製</button>
+        <pre>請幫我加上「<b>[功能名稱]</b>」。
+
+一次只做這一個功能就好，做完我看過再繼續下一個。
+加完請告訴我你改了哪些地方。</pre>
+      </div>
+      <div class="fillhint">👇 建議的加入順序（由實用到加分）：</div>
+      <div class="ideas">
+        <div class="idea"><b>🗺 互動地圖</b><span>可依日期篩選當天路線，標記景點與住宿，點了直接開導航</span></div>
+        <div class="idea"><b>🎒 行李清單打勾</b><span>勾過的關掉重開還記得，出發前一天很好用</span></div>
+        <div class="idea"><b>💰 預算表</b><span>分項列出，附當地幣別與台幣換算</span></div>
+        <div class="idea"><b>📂 長段落收合</b><span>資訊多的時候，預設收起來版面才不會爆炸</span></div>
+        <div class="idea"><b>✅ 出發前待辦</b><span>簽證、保險、網路卡、證件，逐項打勾</span></div>
+        <div class="idea"><b>🖨 列印／存 PDF</b><span>存成 PDF 帶著走，完全不怕沒網路</span></div>
+        <div class="idea"><b>💱 匯率換算機</b><span>浮動按鈕，任何一頁都叫得出來</span></div>
+        <div class="idea"><b>📊 花費追蹤</b><span>旅行中記每天花多少，對照原本預算</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 4 -->
+  <div class="step">
+    <div class="step-head">
+      <div class="step-n">4</div>
+      <div class="step-t">
+        <h3>訂好了就把真實資料灌進去</h3>
+        <div class="why">Claude 看得懂截圖，訂房、機票、租車確認頁直接貼給它就好，不用自己打字。</div>
+      </div>
+    </div>
+    <div class="step-body">
+      <div class="prompt">
+        <button class="copy" type="button">複製</button>
+        <pre>我把訂好的 <b>[機票／住宿／租車／票券]</b> 截圖給你，
+請把資訊更新進網站，取代原本的預估或待確認。
+
+更新的時候請一併檢查：
+<b>還有哪些地方也提到這筆資訊，需要一起改？</b>
+例如預算表、交通說明、地圖標記、每天的動線描述、
+還有前後幾天的銜接時間。
+
+改完請列出你同步更新了哪些地方。</pre>
+      </div>
+      <div class="fillhint">📎 把截圖一起附上。多張的話說明順序，例如「由左到右照日期排」。</div>
+    </div>
+  </div>
+
+  <!-- STEP 5 -->
+  <div class="step">
+    <div class="step-head">
+      <div class="step-n">5</div>
+      <div class="step-t">
+        <h3>叫 Claude 當 QA 檢查自己</h3>
+        <div class="why">整份做完一定要來這一步。改了很多輪之後，各頁之間幾乎一定會出現對不上的地方，自己看很難發現。</div>
+      </div>
+    </div>
+    <div class="step-body">
+      <div class="prompt">
+        <button class="copy" type="button">複製</button>
+        <pre>請擔任 QA，把整份網站從頭到尾檢查一遍，重點：
+
+1. <b>內容矛盾</b>：同一件事在不同分頁的說法一致嗎？
+2. <b>數字</b>：預算表每一列加起來，跟小計、總計、
+   平均每人對得上嗎？請實際算給我看
+3. <b>時間邏輯</b>：每天的行程時間接得起來嗎？
+   移動時間合理嗎？有沒有哪天排太滿或太空？
+4. <b>過時殘留</b>：有沒有前面改過、但某個角落忘了更新的舊資訊？
+5. <b>日期</b>：標示的星期幾，跟實際日曆對得上嗎？
+6. <b>連結</b>：每個地圖連結真的指向正確地點嗎？
+7. <b>功能</b>：所有按鈕、分頁、打勾、收合都正常嗎？
+
+先列出你找到的問題，再幫我修正。</pre>
+      </div>
+      <div class="fillhint">🔁 大改動之後就再跑一次這段，很值得。</div>
+    </div>
+  </div>
+
+  <!-- STEP 6 -->
+  <div class="step">
+    <div class="step-head">
+      <div class="step-n">6</div>
+      <div class="step-t">
+        <h3>會影響成行的資訊，一定要查證</h3>
+        <div class="why">簽證、駕照、入境規定這類東西每年都在變，而且弄錯的代價很高 —— 可能到了現場才發現不能用。</div>
+      </div>
+    </div>
+    <div class="step-body">
+      <div class="prompt">
+        <button class="copy" type="button">複製</button>
+        <pre>請幫我查證網站裡所有「<b>弄錯就會影響成行</b>」的資訊，
+<b>上網查最新資料，不要憑印象回答</b>：
+
+・入境規定：簽證、入境表單、需不需要事先線上申請
+・證件：當地開車需要什麼證件？台灣的國際駕照那邊認嗎？
+  要不要另外辦譯本？費用、辦理地點、要多久？
+・交通：票價、班次、末班車時間
+・景點：門票、營業時間、公休日、要不要預約
+・任何當地的法規或限制
+
+查完請告訴我：<b>哪幾項原本寫錯了</b>，然後幫我更新成正確的，
+並附上你查到的來源。</pre>
+      </div>
+      <div class="fillhint">⚠️ 這步真的不要跳過。尤其自駕行程的駕照規定，各國差很多。</div>
+    </div>
+  </div>
+
+  <!-- STEP 7 -->
+  <div class="step">
+    <div class="step-head">
+      <div class="step-n">7</div>
+      <div class="step-t">
+        <h3>效能與設計最後打磨</h3>
+        <div class="why">改很多輪之後會累積沒用到的程式碼；照片如果直接內嵌，檔案會胖到手機開很慢。</div>
+      </div>
+    </div>
+    <div class="step-body">
+      <div class="prompt">
+        <button class="copy" type="button">複製</button>
+        <pre>請幫我做兩件事：
+
+<b>一、效能</b>
+・檢查有沒有沒被用到的 CSS 或 JS 可以刪掉
+・如果有內嵌圖片，看看能不能壓縮
+・告訴我檔案大小前後差多少
+
+<b>二、設計</b>
+請以 UI／UX 設計師的角度重新檢視整份網站：
+・手機上的閱讀體驗，字級、行距、間距夠舒服嗎？
+・資訊層級清楚嗎？重要的東西有被凸顯嗎？
+・顏色對比在陽光下看得清楚嗎？（旅行時常在戶外看）
+・列印或存成 PDF 的時候版面會不會亂掉？
+
+列出你建議的改動，再幫我優化。</pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 8 -->
+  <div class="step">
+    <div class="step-head">
+      <div class="step-n">8</div>
+      <div class="step-t">
+        <h3>之後隨時更新</h3>
+        <div class="why">出發前資訊會一直變。每次更新都要求它順便做跨頁稽核，才不會愈改愈亂。</div>
+      </div>
+    </div>
+    <div class="step-body">
+      <div class="prompt">
+        <button class="copy" type="button">複製</button>
+        <pre><b>[貼上新資訊或截圖]</b>
+
+請更新進網站。改完之後<b>做一次跨頁稽核</b>，
+確認沒有其他地方因為這次修改而變得過時或互相矛盾。
+
+另外，檔案已經變大了，修改時請用
+<b>局部替換的方式</b>（例如寫一個 patch 腳本改指定段落），
+不要整份重寫，這樣比較不會動到其他正常的地方。</pre>
+      </div>
+    </div>
+  </div>
+
+  <h2>🔑 八個關鍵技巧</h2>
+  <div class="card">
+    <div class="tip"><div class="ic">1️⃣</div><div class="tx">
+      <b>一次只改一件事</b>
+      同一句話塞五個需求，通常有兩三個會被敷衍帶過。分開講、逐一確認，總時間其實更短。</div></div>
+
+    <div class="tip"><div class="ic">🔍</div><div class="tx">
+      <b>每次改完都要求「跨頁稽核」</b>
+      改了 A 頁的數字，B 頁的總計、C 頁的說明很可能也要跟著改。明講這句，它才會主動去找。</div></div>
+
+    <div class="tip"><div class="ic">🌐</div><div class="tx">
+      <b>規定類資訊一律要求「上網查證」</b>
+      不加這句，AI 可能用舊資訊回答。證件、簽證、票價這種弄錯代價高的，一定要它查完附來源。</div></div>
+
+    <div class="tip"><div class="ic">📸</div><div class="tx">
+      <b>截圖直接貼，不用自己打字</b>
+      訂房確認信、機票、租車憑證，截圖丟進去它讀得懂。多張記得說明順序。</div></div>
+
+    <div class="tip"><div class="ic">🗺</div><div class="tx">
+      <b>地圖記得要求「設備援圖資」</b>
+      免費地圖服務常會擋掉本機開啟的網頁，整片空白。請它加上「主要圖資失敗時自動切換備援」。</div></div>
+
+    <div class="tip"><div class="ic">💾</div><div class="tx">
+      <b>打勾、記帳這類功能存在瀏覽器本機</b>
+      直接說「資料存在瀏覽器裡就好，不需要後端」，就能有記憶功能又不用架伺服器。</div></div>
+
+    <div class="tip"><div class="ic">🖼</div><div class="tx">
+      <b>放照片要提醒壓縮</b>
+      一張沒壓過的手機照片就可能讓檔案肥好幾倍，手機開起來很慢。請它壓過再放。</div></div>
+
+    <div class="tip"><div class="ic">✂️</div><div class="tx">
+      <b>檔案變大後，請它「局部修改」</b>
+      整份重寫容易把原本好好的地方弄壞。明確要求用替換指定段落的方式改。</div></div>
+  </div>
+
+  <div class="card warm" style="margin-top:20px;">
+    <h3>🎁 最後幾個小提醒</h3>
+    <ul class="neat check">
+      <li>做好後<strong>存一份 PDF</strong> 在手機裡，完全不怕當地沒網路或漫遊出問題。</li>
+      <li>把檔案<strong>傳一份給旅伴</strong>，兩個人看到的資訊才會一樣。</li>
+      <li>如果網站裡放了<strong>訂房編號、帳本連結</strong>這類私人資訊，轉傳前想一下要不要先拿掉。</li>
+      <li>出發前一週再跑一次 <strong>STEP 5 的 QA</strong> 和 <strong>STEP 6 的查證</strong>，把最新狀況補進去。</li>
+    </ul>
+  </div>
+
+  <footer>
+    祝旅途順利 ☀️<br>
+    <span style="font-size:11.5px;opacity:.75;">這份指南本身也是用 Claude 做的</span>
+  </footer>
+</div>
+
+<script>
+(function(){
+  function flash(btn, ok){
+    var old = '複製';
+    btn.textContent = ok ? '已複製 ✓' : '請手動選取';
+    btn.className = 'copy ' + (ok ? 'done' : 'fail');
+    setTimeout(function(){ btn.textContent = old; btn.className = 'copy'; }, ok ? 1600 : 2600);
+  }
+  function legacyCopy(text, btn){
+    var ta = document.createElement('textarea');
+    ta.value = text;
+    ta.setAttribute('readonly','');
+    ta.style.position = 'fixed';
+    ta.style.top = '0'; ta.style.left = '-9999px';
+    document.body.appendChild(ta);
+    ta.select();
+    ta.setSelectionRange(0, ta.value.length);
+    var ok = false;
+    try { ok = document.execCommand('copy'); } catch(e){ ok = false; }
+    document.body.removeChild(ta);
+    flash(btn, ok);
+  }
+  document.querySelectorAll('.prompt').forEach(function(box){
+    var btn = box.querySelector('.copy');
+    var pre = box.querySelector('pre');
+    if(!btn || !pre) return;
+    btn.addEventListener('click', function(){
+      var text = pre.innerText || pre.textContent || '';
+      text = text.replace(/ /g, ' ');
+      if (navigator.clipboard && navigator.clipboard.writeText){
+        navigator.clipboard.writeText(text).then(function(){
+          flash(btn, true);
+        }).catch(function(){
+          legacyCopy(text, btn);
+        });
+      } else {
+        legacyCopy(text, btn);
+      }
+    });
+  });
+})();
+</script>
+</body>
+</html>
